@@ -687,8 +687,8 @@ export default function CreamReveal() {
         <button
           type="button"
           onClick={() => setRevealed(true)}
-          className="absolute bottom-4 right-4 z-30 cursor-pointer rounded-sm bg-white/80 px-2 py-1 text-[11px] tracking-[-0.01em] text-[#3d3b3a]/75 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
-          style={{ fontFamily: "'GroteskFont', Arial, sans-serif" }}
+          className="absolute bottom-3 left-4 z-30 inline-flex min-h-11 cursor-pointer items-center border-0 bg-transparent px-4 text-[11px] text-[#252525] no-underline hover:text-[#00C6C2] active:text-[#00C6C2] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-[#00C6C2] focus-visible:outline-offset-3"
+          style={{ fontFamily: "'ChampagneFont', sans-serif" }}
         >
           show details
         </button>
@@ -698,7 +698,8 @@ export default function CreamReveal() {
         <button
           type="button"
           onClick={restart}
-          className="absolute bottom-2 right-3 z-20 cursor-pointer px-2 py-1 text-[10px] tracking-[0.05em] text-black/40 hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="absolute bottom-3 left-4 z-20 inline-flex min-h-11 cursor-pointer items-center border-0 bg-transparent px-4 text-[11px] text-[#252525] no-underline hover:text-[#00C6C2] active:text-[#00C6C2] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-[#00C6C2] focus-visible:outline-offset-3"
+          style={{ fontFamily: "'ChampagneFont', sans-serif" }}
           aria-label="Cover the invitation with frosting again"
         >
           frost again ↺
