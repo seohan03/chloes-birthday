@@ -1,12 +1,12 @@
-# Psst... you're invited.
+# Psst... you're invited!
 
-The **first scene only** of an experimental birthday invitation: an off-white/white canvas; translucent, pastel, bead-like confetti with real Matter.js collisions; and one whispered greeting. Built with Next.js App Router, TypeScript, Tailwind CSS 4, Motion for React, and Matter.js. No CSS confetti, canvas-confetti, external images, remote fonts, or extra scenes.
+The first scene of an interactive birthday invitation website. It has a simple white background, pastel confetti that falls and piles up using Matter.js physics, and a little welcome message.
 
-## 1. Initialize or use the supplied project
+Built with Next.js, TypeScript, Tailwind CSS, Motion, and Matter.js.
 
-### Recommended: use the complete supplied source
+## Getting started
 
-Extract `birthday-confetti-intro.zip`, open the project directory, then run:
+If you're using the provided ZIP file, unzip it, open the project folder, and run:
 
 ```bash
 cd birthday-confetti-intro
@@ -14,9 +14,13 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:3000**. The project already contains the full Next.js setup, so **do not run `create-next-app` inside it**.
+Open http://localhost:3000 to see the website.
 
-### Starting from an empty folder instead
+The ZIP already includes the Next.js setup, so you don't need to create a new project.
+
+### Starting from scratch
+
+If you aren't using the ZIP, create a Next.js project:
 
 ```bash
 npx create-next-app@latest birthday-confetti-intro --typescript --tailwind --eslint --app --use-npm --no-src-dir --import-alias '@/*'
@@ -25,88 +29,85 @@ npm install matter-js motion
 npm install -D @types/matter-js
 ```
 
-Then replace the generated app/configuration files with those supplied here, including `package.json` and `postcss.config.mjs`, and run `npm install` again to reconcile dependencies. The supplied project is simpler and less error-prone.
+Then copy over the provided files, including the configuration files and `package.json`, and run `npm install` again.
 
-## 2. Dependencies
-
-Runtime: `next`, `react`, `react-dom`, `matter-js`, `motion`.
-
-Build/dev: `typescript`, `tailwindcss`, `@tailwindcss/postcss`, `@types/matter-js`, `@types/node`, `@types/react`, `@types/react-dom`.
-
-Versions are defined in `package.json`. `npm install` will create `package-lock.json`; commit it to Git so Vercel installs reproducibly with `npm ci`.
-
-## 3. File structure
+## Project files
 
 ```text
 birthday-confetti-intro/
 ├── app/
-│   ├── globals.css            # White backdrop and Tailwind import
-│   ├── layout.tsx             # Metadata and document shell
-│   └── page.tsx               # Renders the first scene only
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
 ├── components/
-│   ├── BirthdayIntro.tsx       # Animated editorial copy (Motion)
-│   └── ConfettiPhysics.tsx     # Client canvas lifecycle, reduced-motion listener
+│   ├── BirthdayIntro.tsx
+│   └── ConfettiPhysics.tsx
 ├── lib/confetti/
-│   ├── config.ts              # Physical constants, palette, device caps
-│   ├── types.ts               # Shape and particle types
-│   ├── ConfettiRenderer.ts    # Cached watercolor bead sprites, Canvas 2D
-│   └── ConfettiSimulation.ts  # Engine, boundaries, spawn timing, input, RAF
-├── .gitignore
-├── next-env.d.ts
-├── next.config.ts
+│   ├── config.ts
+│   ├── types.ts
+│   ├── ConfettiRenderer.ts
+│   └── ConfettiSimulation.ts
 ├── package.json
-├── postcss.config.mjs
-├── tsconfig.json
 └── README.md
 ```
 
-## 4. Choreography
+The main files to know are:
 
-- **0–1s:** the initial handful of beads enters from completely above the top edge, starting on the left.
-- **1–3s:** the densest shower arrives; genuine bouncing, tumbles, collisions and crowding begin.
-- **3–5s:** the spawn rate decreases, leaving more negative space.
-- **5–7s:** the last pieces arrive and continue to settle; the pile stays in the Matter world.
-- **After ~6.7s:** a shallow interaction surface at the bottom activates. Mouse hover nudges beads; mouse/touch pressing a bead creates a damped Matter spring. Releasing removes the spring and normal gravity takes over.
-- **At 1.5s:** the small `psst... you're invited.` line fades upward in Motion.
-- **Reduced motion:** a physical arrangement is settled synchronously, drawn once, and never RAF-animated. The text appears immediately.
+- `BirthdayIntro.tsx` — the welcome message and its animation.
+- `ConfettiPhysics.tsx` — sets up the confetti canvas.
+- `ConfettiSimulation.ts` — controls how the confetti falls, bounces, and moves.
+- `ConfettiRenderer.ts` — controls how the confetti looks.
+- `config.ts` — stores the colors and physics settings.
 
-All pieces are dynamic rigid bodies. The bottom and side walls are static but invisible. The sprite shapes are approximate convex collisions (circles, rounded rectangles, 5/6-gons), which is deliberate for stability and mobile performance. Donut holes are visual; the ring is physically a solid bead, not a concave mesh.
+## How the scene works
 
-## 5. Physics tuning
+When someone opens the website, pastel confetti starts falling from the top of the screen.
 
-| Parameter | Default | Role |
-|---|---:|---|
-| `gravity` | 1.14 | Downward acceleration in Matter's normalized gravity units |
-| `gravityScale` | 0.001 | Matter's gravity scaling convention |
-| `restitution` | 0.28 | A small, tactile bounce at impact |
-| `friction` | 0.66 | Dynamic friction between beads and ground |
-| `frictionStatic` | 0.82 | Helps a finished pile hold its shape |
-| `frictionAir` | 0.012 | Damps translation and spin while free-falling/tumbling |
-| `density` | 0.0012 | Appropriate mass for tiny solids; mass scales with area |
-| `sleepThreshold` | 65 | Allows calmer beads to sleep and improves performance |
-| `positionIterations` | 8 | Resolves penetration in stacks |
-| `velocityIterations` | 8 | Resolves collision impulses and bounces |
-| `constraintIterations` | 3 | Stable pointer-drag springs |
-| `dragStiffness` | 0.18 | How insistently a bead follows the hand |
-| `dragDamping` | 0.13 | Suppresses exaggerated dragging oscillation |
-| `fixedStepMs` | 16.667 | Stable 60 Hz physics independent of screen FPS |
-| `maxStepsPerFrame` | 4 | Avoids the spiral of death on slow hardware |
-| `maxDpr` | 2 | Preserves sharp details without excessive pixel work |
-| `particleLimit(width)` | 106–208 | Mobile/desktop workload limits |
+The pieces bounce, collide, and slowly pile up at the bottom instead of disappearing.
 
-The ticker adds elapsed time to an accumulator, advances the engine in fixed 1/60 s steps, caps catch-up work, then draws once per browser `requestAnimationFrame`. The renderer operates in CSS pixel coordinates; **DPR affects only canvas backing-store resolution**, not Matter physics or pointer coordinates. The window and `visualViewport` resize listeners, plus a `ResizeObserver`, resize both backing store and static walls; the bottom-near pile shifts along with the new scene floor.
+After about 1.5 seconds, the message "psst... you're invited." fades into view.
 
-The sprites are pre-rendered **once per particle** to tiny canvases and composited with rotation, avoiding hundreds of DOM elements and repeated gradient/path work per frame. Once every bead is asleep after the entrance, the RAF loop stops entirely; dragging and hover input wake it again. Bodies may settle or wake up from collision, hover disturbance, or dragging.
+The confetti stops falling after around 7 seconds, but the pile stays on screen.
 
-## 6. Adjusting the art direction
+Once the confetti settles, visitors can move their cursor near the pile or drag the pieces around. This also works with touch on mobile.
 
-- **Colors:** `PALETTE` in `lib/confetti/config.ts` matches the provided pastel beads: rose, lilac, pale blue, periwinkle, mint, sea glass, butter yellow, pistachio, and apricot.
-- **Shapes:** `createAppearance()` in `ConfettiSimulation.ts` controls the proportions of marbles, faceted beads, rings, flowers, tubes, gold-rim inlays, hearts and rounded stars.
-- **Artwork:** `ConfettiRenderer.ts` paints the shapes as soft, slightly translucent illustrations. No background image is used; everything that falls has a physical body.
-- **Rain timing/left bias:** `createSpawnSchedule()` and `spawnDue()` in `ConfettiSimulation.ts`.
-- **Lettering:** `components/BirthdayIntro.tsx`.
+The animation is reduced for visitors who have reduced-motion settings enabled.
 
-## 7. Production checks and deployment
+## Making changes
+
+Most of the settings can be found in `lib/confetti/config.ts`.
+
+### Confetti appearance
+
+To change the colors, edit `PALETTE` in `config.ts`.
+
+To change the shapes, look for `createAppearance()` in `ConfettiSimulation.ts`.
+
+The confetti is drawn in `ConfettiRenderer.ts`, so you can also change how the individual pieces look there.
+
+### Confetti movement
+
+You can adjust how the pieces move by changing the physics settings.
+
+| Setting | What it changes |
+|---|---|
+| `gravity` | How quickly the confetti falls |
+| `restitution` | How much the pieces bounce |
+| `friction` | How easily they slide |
+| `frictionAir` | How quickly movement slows down |
+| `dragStiffness` | How closely pieces follow your cursor |
+
+You can also change how many pieces appear using `particleLimit()` in `config.ts`.
+
+The timing and spawning behavior are handled in `ConfettiSimulation.ts`.
+
+### Welcome message
+
+To change "psst... you're invited." or its animation, edit `components/BirthdayIntro.tsx`.
+
+## Testing the website
+
+To check that everything works, run:
 
 ```bash
 npm run typecheck
@@ -114,41 +115,71 @@ npm run build
 npm run start
 ```
 
-For GitHub:
+Make sure the confetti falls, settles at the bottom, and responds to dragging.
+
+It's also worth testing on your phone to make sure the animation runs smoothly.
+
+## Uploading to GitHub
+
+Create a new GitHub repository, then run:
 
 ```bash
 git init
 git add .
-git commit -m "Build Matter.js confetti invitation intro"
+git commit -m "Add birthday confetti intro"
 git branch -M main
 git remote add origin https://github.com/YOUR-USER/YOUR-REPO.git
 git push -u origin main
 ```
 
-Create an empty GitHub repository first and substitute its real URL. Then go to **vercel.com → Add New → Project**, import that GitHub repository, keep **Framework Preset: Next.js**, and deploy. No environment variables are required. Future pushes to the tracked branch will trigger deployment.
+Replace the repository URL with your own.
 
-If using Vercel CLI instead, install the CLI in your own environment, sign in, and run `vercel` followed by `vercel --prod` when ready.
+## Hosting on Vercel
 
-## 8. Troubleshooting
+1. Go to https://vercel.com.
+2. Create a new project.
+3. Import your GitHub repository.
+4. Keep Next.js as the framework.
+5. Click Deploy.
 
-**Canvas is blank.** Inspect browser console for Canvas2D errors; make sure JS is enabled, `ConfettiPhysics.tsx` is a Client Component, and the parent `<main>` has a measured `100dvh` height. At the first instant, beads are intentionally above the screen and descend shortly afterward. A user with reduced motion sees an immediate static pile.
+Once it's deployed, Vercel will give you a link to your website.
 
-**React hydration mismatch.** Matter.js is instantiated only inside `useEffect`—never in server render or module top-level access to `window`. Do not create the engine or call `document.createElement()` while rendering React on the server. Motion handles the independent text reveal.
+Any new changes pushed to your connected production branch will automatically update the live site.
 
-**Two simulations are running in development.** React Strict Mode mounts effects twice intentionally in development; cleanup cancels RAF, clears the engine, disconnects observers, and removes listeners before the next instance starts. Keep the cleanup in `ConfettiPhysics.tsx`.
+## If something isn't working
 
-**Pieces pass through the floor.** Keep a fixed physics timestep and avoid huge gravity, extremely thin colliders, or much higher initial velocities. Increase `positionIterations`/`velocityIterations` slightly if changing particle sizes or density substantially. The floor is a thick static collider whose *top* is exactly at viewport bottom.
+**Confetti isn't showing**
 
-**Performance stutters on mobile.** Lower the values in `particleLimit()`, shorten the sprite dimensions, or set `maxDpr` to `1.5`. Avoid increasing solver iterations and body count together. The simulation stops trying to catch up after a slow frame to keep the UI responsive.
+Check the browser console for errors and make sure `ConfettiPhysics.tsx` is set up as a client component.
 
-**Drag feels offset on a high-DPI screen.** Never multiply pointer client coordinates by `devicePixelRatio`. Matter works in CSS pixels; the canvas rendering transform handles the scaled backing store. Pointer math uses the canvas `getBoundingClientRect()`.
+**Confetti falls through the bottom**
 
-**Touch gestures block scrolling.** The canvas itself has `pointer-events: none`; only the bottom `min(29dvh, 240px)` interaction strip has `touch-action: none`, and it is activated after the initial rain. Narrow the strip in `ConfettiPhysics.tsx` if future content needs gestures near the footer. Put future interactive buttons above this strip or give them a higher stacking layer. Do not apply `touch-action: none` to the page.
+Check the gravity and collision settings in `ConfettiSimulation.ts`.
 
-**Pile looks too dense or too far left.** Increase the rightward starting velocity gently in `spawnDue()` or widen the left-biased spawn range. Do not use static CSS transforms for the resting pile; Matter must continue to own its position.
+**Animation is laggy**
 
-**Resize/orientation issues.** Keep the actual canvas width and height in sync with its CSS box, and move/scale the three physical boundaries on resize. Do not simply stretch a snapshot of the old canvas.
+Try lowering the number of confetti pieces in `particleLimit()`, especially for mobile.
 
-## 9. Adding later scenes
+**Dragging feels off**
 
-`BirthdayIntro` is a self-contained first scene. A future scene controller can mount/unmount it, or call `destroy()` on the simulation through a scene wrapper. The physics engine, renderer and configuration deliberately do not depend on scene-specific UI or the greeting text.
+Check the pointer coordinates in `ConfettiSimulation.ts`. They should use the canvas position without multiplying by the device pixel ratio.
+
+**Touch isn't working properly**
+
+Check the interaction area in `ConfettiPhysics.tsx`. Only the bottom part of the screen should capture dragging gestures.
+
+**Hydration errors**
+
+Make sure the physics simulation only starts in the browser and not during server rendering.
+
+**Problems after resizing**
+
+Make sure the canvas and physics boundaries update when the screen size changes.
+
+## Adding more scenes
+
+This project currently only includes the first scene.
+
+The confetti animation is kept separate from the welcome message so it's easier to add new scenes later without changing everything.
+
+The next scenes can build on this setup while keeping their own animations and interactions.
